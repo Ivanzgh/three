@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>shard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div id="ThreeJS" style="position: absolute; left:0; top:0"></div>
+
+<script src="../js/three.min.js"></script>
+<script src="../js/controls/OrbitControls.js"></script>
+
+<!-- vertext shader a.k.a. pixel shader -->
+<script id="vertexShader" type="x-shader/x-vertex">
+    varying vec3 vNormal;
+    varying vec3 vPositionNormal;
+    void main()
+    {
+      vNormal = normalize( normalMatrix * normal ); // 转换到视图空间
+      vPositionNormal = normalize(( modelViewMatrix * vec4(position, 1.0) ).xyz);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+
+
+</script>
+<!-- fragment shader a.k.a. pixel shader -->
+<script id="fragmentShader" type="x-shader/x-vertex">
+    uniform vec3 glowColor;
+    uniform float b;
+    uniform float p;
+    uniform float s;
+    varying vec3 vNormal;
+    varying vec3 vPositionNormal;
+    void main()
+    {
+      float a = pow( b + s * abs(dot(vNormal, vPositionNormal)), p );
+      gl_FragColor = vec4( glowColor, a );
+    }
+
+
+</script>
+<script>
+    (function init() {
+        initBase()
+        initObject()
+        render()
+    })()
+
+    function initBase() {
+        const container = document.getElementById('ThreeJS')
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 20000)
+        camera.position.set(0, 0, 200)
+        camera.lookAt(scene.position)
+
+        const renderer = new THREE.WebGLRenderer({antialias: true})
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        container.appendChild(renderer.domElement)
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement)
+        controls.addEventListener('change', render)
+    }
+
+    function initObject() {
+        const customMaterial = new THREE.ShaderMaterial({
+            uniforms:
+                {
+                    "s": {type: "f", value: -1.0},
+                    "b": {type: "f", value: 1.0},
+                    "p": {type: "f", value: 2.0},
+                    glowColor: {type: "c", value: new THREE.Color(0x00ffff)}
+                },
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent,
+            side: THREE.FrontSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
+        });
+        const geometry = new THREE.TorusKnotBufferGeometry(10, 3, 100, 32, 3, 4);
+        const torusKnot = new THREE.Mesh(geometry, customMaterial);
+        scene.add(torusKnot)
+    }
+
+    function render() {
+        renderer.render(scene, camera)
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>scale</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+<script src="../js/three.min.js"></script>
+<script src="../js/controls/OrbitControls.js"></script>
+<script>
+    const scene = new THREE.Scene()  // 场景
+    const geometry = new THREE.BoxBufferGeometry(100,100,100)     // 立方体
+    geometry.scale(0.5,1.5,2)  // 沿x,y,z轴方向各放大0.5倍、1.5倍、2倍
+    geometry.translate(0,0,100)  // 沿z轴平移100
+    geometry.rotateX(Math.PI/4)  // 沿x轴旋转45度
+    geometry.center()       // 居中
+
+    const material = new THREE.MeshBasicMaterial({ color: 0x409eff })  // 材质
+    const mesh = new THREE.Mesh(geometry,material)
+    // mesh.scale.set(0.5,1.5,2)  // 此处也能放大几何体，但是效果和geometry.scale(0.5,1.5,2)还是有差异的
+    scene.add(mesh)
+
+    const k = window.innerWidth / window.innerHeight;
+    const s = 200; //三维场景显示范围控制系数，系数越大，显示的范围越大
+    const camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);   // 正交投影
+    camera.position.set(300,400,300)
+    camera.lookAt(scene.position)
+    // 渲染器
+    const renderer = new THREE.WebGLRenderer()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(renderer.domElement)
+
+    function animate() {
+        requestAnimationFrame(animate)
+        renderer.render(scene, camera)
+    }
+    animate()
+
+    // 鼠标实现平移、旋转、缩放
+    const controls = new THREE.OrbitControls(camera,renderer.domElement); //创建控件对象
+    // controls.addEventListener('change', animate);//监听鼠标、键盘事件
+</script>
+</body>
+</html>

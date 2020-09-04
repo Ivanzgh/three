@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>tree</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<script src="../js/three.min.js"></script>
+<script>
+    const scene = new THREE.Scene()
+    // 头部网格模型和组
+    const headMesh = sphereMesh(10, 0, 0, 0, { color: 0x999999 });
+    headMesh.name = "脑壳"
+    const leftEyeMesh = sphereMesh(1, 8, 5, 4, { color: 0xff0000 });
+    leftEyeMesh.name = "左眼"
+    const rightEyeMesh = sphereMesh(1, 8, 5, -4, { color: 0xff0000 });
+    rightEyeMesh.name = "右眼"
+    const headGroup = new THREE.Group();
+    headGroup.name = "头部"
+    headGroup.add(headMesh, leftEyeMesh, rightEyeMesh);
+    // 身体网格模型和组
+    const neckMesh = cylinderMesh(3, 10, 0, -15, 0, { color: 0x00FFFF });
+    neckMesh.name = "脖子"
+    const bodyMesh = cylinderMesh(14, 30, 0, -35, 0, { color: 0xFFD700 });
+    bodyMesh.name = "腹部"
+    const leftLegMesh = cylinderMesh(4, 60, 0, -80, -7, { color: 0x1E90FF });
+    leftLegMesh.name = "左腿"
+    const rightLegMesh = cylinderMesh(4, 60, 0, -80, 7, { color: 0x1E90FF });
+    rightLegMesh.name = "右腿"
+    const legGroup = new THREE.Group();
+    legGroup.name = "腿"
+    legGroup.add(leftLegMesh, rightLegMesh);
+    const bodyGroup = new THREE.Group();
+    bodyGroup.name = "身体"
+    bodyGroup.add(neckMesh, bodyMesh, legGroup);
+    // 人Group
+    const personGroup = new THREE.Group();
+    personGroup.name = "人"
+    personGroup.add(headGroup, bodyGroup)
+    personGroup.translateY(50)
+    scene.add(personGroup);
+
+    // 球体网格模型创建函数
+    function sphereMesh(R, x, y, z,materialOption) {
+        const geometry = new THREE.SphereGeometry(R, 25, 25);
+        const material = new THREE.MeshPhongMaterial(materialOption);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(x, y, z);
+        return mesh;
+    }
+    // 圆柱体网格模型创建函数
+    function cylinderMesh(R, h, x, y, z, materialOption) {
+        const geometry = new THREE.CylinderGeometry(R, R, h, 25, 25); // 圆柱的顶部半径、底部半径、高度
+        const material = new THREE.MeshPhongMaterial(materialOption);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(x, y, z);
+        return mesh;
+    }
+
+
+    const ambient = new THREE.AmbientLight(0x888888);
+    scene.add(ambient);
+    const point = new THREE.PointLight(0xffffff);
+    point.position.set(400, 200, 300);
+    scene.add(point);
+
+    // const k = window.innerWidth / window.innerHeight;
+    // const s = 200;
+    // const camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);  // 左截面、右截面、上截面、下截面、近截面、远截面
+    // camera.position.set(300,400,300)
+    // camera.lookAt(scene.position)
+
+    // 透视相机
+    const camera  = new THREE.PerspectiveCamera(20,2,1,1000)  // 视角(单位是度)、视锥体长宽比、近截面、远截面
+    camera.position.set(300,400,300)
+    camera.lookAt(scene.position)
+
+    const renderer = new THREE.WebGLRenderer()
+    renderer.setSize(window.innerWidth,window.innerHeight)
+    document.body.appendChild(renderer.domElement)
+
+    function animate() {
+        requestAnimationFrame(animate)
+        renderer.render(scene,camera)
+    }
+    animate()
+</script>
+</body>
+</html>

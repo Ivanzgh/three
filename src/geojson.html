@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>geojson</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+<script src="../js/three.min.js"></script>
+<script src="../js/controls/OrbitControls.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    let scene = new THREE.Scene()
+    // 辅助三维坐标系  红色代表 X 轴, 绿色代表 Y 轴, 蓝色代表 Z 轴
+    const axisHelper = new THREE.AxesHelper(250);
+    scene.add(axisHelper);
+
+    // 立方体网格模型
+    const geometry1 = new THREE.BoxGeometry(100,100,100);
+    const material1 = new THREE.MeshLambertMaterial({ color: 0x0000ff });  // 材质 漫反射
+    const mesh1 = new THREE.Mesh( geometry1, material1 );  // 网格模型
+    scene.add(mesh1);
+
+    // 点光源
+    const point = new THREE.PointLight(0xffffff);  // 光照强度
+    point.position.set(400, 200, 300); //点光源位置
+    scene.add(point);
+    // 环境光
+    const ambient = new THREE.AmbientLight(0x444444);
+    scene.add(ambient);
+
+    //创建相机对象
+    const k = window.innerWidth / window.innerHeight; //窗口宽高比
+    const s = 200; //三维场景显示范围控制系数，系数越大，显示的范围越大
+    const camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);   // 正射投影
+    camera.position.set(200, 300, 200);  //设置相机位置
+    camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+
+    const renderer = new THREE.WebGLRenderer();   // 渲染器
+    renderer.setSize( window.innerWidth, window.innerHeight );  //设置渲染区域尺寸
+    renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+    document.body.appendChild( renderer.domElement );  //body元素中插入canvas对象
+
+    // 动画
+    function animate() {
+        requestAnimationFrame( animate );
+        renderer.render( scene, camera );
+    }
+
+    // 加载json文件
+    let loader = new THREE.FileLoader();
+    loader.load('../assets/data/pgz_jzlk.json', function (data) {
+        let jsonData = JSON.parse(data);
+        console.log(jsonData)
+    });
+    THREE.Cache.enabled = true;
+
+    // 页面资源加载完全执行函数
+    window.onload = function () {
+        animate();
+    }
+</script>
+</body>
+</html>

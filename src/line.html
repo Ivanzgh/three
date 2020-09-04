@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>line</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<script src="../js/three.min.js"></script>
+<script>
+    const scene = new THREE.Scene();
+
+    const material1 = new THREE.LineBasicMaterial({color: 0x0000ff});
+    const points = [];
+    points.push(new THREE.Vector3(-10, 0, 0));
+    points.push(new THREE.Vector3(0, 20, 0));
+    points.push(new THREE.Vector3(10, 0, 0));
+    // setFromPoints()把数组points中的顶点数据提取出来赋值给几何体的顶点位置属性
+    const geometry1 = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(geometry1, material1);
+    scene.add(line);
+
+    // 椭圆曲线
+    // const curve = new THREE.EllipseCurve(0, 0, 5, 10, 0, 2 * Math.PI,false,0)
+
+    // 样条曲线
+    // const curve = new THREE.CatmullRomCurve3([
+    //     new THREE.Vector3(-50, 20, 90),
+    //     new THREE.Vector3(-10, 40, 40),
+    //     new THREE.Vector3(0, 0, 0),
+    //     new THREE.Vector3(60, -60, 0),
+    //     new THREE.Vector3(70, 0, 80)
+    // ]);
+
+    // 二维二次贝赛尔曲线
+    // const curve = new THREE.QuadraticBezierCurve(new THREE.Vector2(-80,10), new THREE.Vector2(100,0), new THREE.Vector2(80,10))
+    // 三维二次贝赛尔曲线
+    // const p21 = new THREE.Vector3(-80, 0, 0);
+    // const p22 = new THREE.Vector3(20, 100, 0);
+    // const p23 = new THREE.Vector3(80, 0, 0);
+    // const curve = new THREE.QuadraticBezierCurve3(p21, p22, p23);
+    // 二维三次贝赛尔曲线
+    // const p231 = new THREE.Vector3(-80, 0, 0);
+    // const p232 = new THREE.Vector3(-40, 100, 0);
+    // const p233 = new THREE.Vector3(40, 100, 0);
+    // const p234 = new THREE.Vector3(80, 0, 0);
+    // const curve = new THREE.CubicBezierCurve(p231, p232, p233, p234);
+    // 三维三次贝赛尔曲线
+    const p331 = new THREE.Vector3(-80, 0, 0);
+    const p332 = new THREE.Vector3(-40, 100, -10);
+    const p333 = new THREE.Vector3(40, 100, -10);
+    const p334 = new THREE.Vector3(80, 0, 0);
+    const curve = new THREE.CubicBezierCurve3(p331, p332, p333, p334);
+
+    const points2 = curve.getPoints(100)
+    const geometry2 = new THREE.BufferGeometry().setFromPoints(points2)
+    const material2 = new THREE.LineBasicMaterial({color: 0xffff00})
+    const arcCurve = new THREE.Line(geometry2, material2)
+    scene.add(arcCurve)
+
+    // 直线
+    const lineCurve = new THREE.LineCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(45, 50, 80))  // 三维直线
+    const geometry3 = new THREE.BufferGeometry().setFromPoints(lineCurve.getPoints(50))
+    const marterial3 = new THREE.LineBasicMaterial({color: 0x409eff})
+    scene.add(new THREE.Line(geometry3, marterial3))
+
+    const lineCurve2 = new THREE.LineCurve(new THREE.Vector2(60, 0), new THREE.Vector2(45, 50))       // 二维直线
+    const geometry4 = new THREE.BufferGeometry().setFromPoints(lineCurve2.getPoints(50))
+    const marterial4 = new THREE.LineBasicMaterial({color: 0xffff00})
+    scene.add(new THREE.Line(geometry4, marterial4))
+
+
+    // 辅助三维坐标系  红色代表 X 轴, 绿色代表 Y 轴, 蓝色代表 Z 轴
+    let axesHelper = new THREE.AxesHelper(1000);
+    scene.add(axesHelper);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+    camera.position.set(160, 200, 200);
+    camera.lookAt(scene.position);
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    renderer.render(scene, camera);
+</script>
+</body>
+</html>
